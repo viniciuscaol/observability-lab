@@ -1,0 +1,37 @@
+groups:
+  - name: linux-host
+    rules:
+      - record: lab:cpu_usage:percent
+        expr: 100 * (1 - avg by (instance) (rate(node_cpu_seconds_total{job="node",mode="idle"}[2m])))
+      - record: lab:memory_usage:percent
+        expr: 100 * (1 - node_memory_MemAvailable_bytes{job="node"} / node_memory_MemTotal_bytes{job="node"})
+      - record: lab:filesystem_usage:percent
+        expr: 100 * (1 - node_filesystem_avail_bytes{job="node",fstype!~"tmpfs|overlay|squashfs"} / node_filesystem_size_bytes{job="node",fstype!~"tmpfs|overlay|squashfs"})
+      - alert: NodeExporterDown
+        expr: up{job="node"} == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: 'Coletor indisponível em {{ $labels.instance }}'
+      - alert: HostHighCPU
+        expr: lab:cpu_usage:percent > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'CPU acima de 85% em {{ $labels.instance }}'
+      - alert: HostHighMemory
+        expr: lab:memory_usage:percent > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Memória acima de 90% em {{ $labels.instance }}'
+      - alert: HostDiskAlmostFull
+        expr: lab:filesystem_usage:percent > 85 and node_filesystem_readonly{job="node"} == 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Disco acima de 85% em {{ $labels.instance }}:{{ $labels.mountpoint }}'

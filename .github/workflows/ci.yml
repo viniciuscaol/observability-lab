@@ -1,0 +1,43 @@
+name: Observability CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integration:
+    name: Metrics, dashboard and alerts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+      - name: Generate local credentials
+        run: python scripts/init.py
+      - name: Validate Python and dashboard JSON
+        run: |
+          python -m compileall -q scripts
+          python -m json.tool grafana/dashboards/linux-host.json > /dev/null
+          docker compose config --quiet
+      - name: Validate Prometheus configuration
+        run: docker compose run --rm --no-deps --entrypoint /bin/promtool prometheus check config /etc/prometheus/prometheus.yml
+      - name: Test alert thresholds, delays and recovery
+        run: docker compose run --rm --no-deps --entrypoint /bin/promtool prometheus test rules /etc/prometheus/tests/rules.test.yml
+      - name: Start lab
+        run: docker compose up -d
+      - name: Verify live metrics, provisioning and alert lifecycle
+        run: python scripts/smoke.py
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs --no-color --tail=100
+      - name: Remove disposable CI data
+        if: always()
+        run: docker compose down --volumes --remove-orphans
