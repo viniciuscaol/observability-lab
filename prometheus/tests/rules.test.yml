@@ -1,0 +1,392 @@
+{
+  "rule_files": [
+    "/etc/prometheus/rules.yml"
+  ],
+  "evaluation_interval": "1m",
+  "tests": [
+    {
+      "name": "healthy host",
+      "interval": "1m",
+      "input_series": [
+        {
+          "series": "up{job=\"node\",instance=\"node-exporter:9100\"}",
+          "values": "1+0x20"
+        },
+        {
+          "series": "node_cpu_seconds_total{job=\"node\",instance=\"node-exporter:9100\",cpu=\"0\",mode=\"idle\"}",
+          "values": "0+60x20"
+        },
+        {
+          "series": "node_memory_MemAvailable_bytes{job=\"node\",instance=\"node-exporter:9100\"}",
+          "values": "80+0x20"
+        },
+        {
+          "series": "node_memory_MemTotal_bytes{job=\"node\",instance=\"node-exporter:9100\"}",
+          "values": "100+0x20"
+        },
+        {
+          "series": "node_filesystem_avail_bytes{job=\"node\",instance=\"node-exporter:9100\",mountpoint=\"/\",device=\"/dev/vda1\",fstype=\"ext4\"}",
+          "values": "70+0x20"
+        },
+        {
+          "series": "node_filesystem_size_bytes{job=\"node\",instance=\"node-exporter:9100\",mountpoint=\"/\",device=\"/dev/vda1\",fstype=\"ext4\"}",
+          "values": "100+0x20"
+        },
+        {
+          "series": "node_filesystem_readonly{job=\"node\",instance=\"node-exporter:9100\",mountpoint=\"/\",device=\"/dev/vda1\",fstype=\"ext4\"}",
+          "values": "0+0x20"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "15m",
+          "alertname": "NodeExporterDown",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "15m",
+          "alertname": "HostHighCPU",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "15m",
+          "alertname": "HostHighMemory",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "15m",
+          "alertname": "HostDiskAlmostFull",
+          "exp_alerts": []
+        }
+      ]
+    },
+    {
+      "name": "exporter pending then firing",
+      "interval": "1m",
+      "input_series": [
+        {
+          "series": "up{job=\"node\",instance=\"node-exporter:9100\"}",
+          "values": "0+0x20"
+        },
+        {
+          "series": "node_cpu_seconds_total{job=\"node\",instance=\"node-exporter:9100\",cpu=\"0\",mode=\"idle\"}",
+          "values": "0+60x20"
+        },
+        {
+          "series": "node_memory_MemAvailable_bytes{job=\"node\",instance=\"node-exporter:9100\"}",
+          "values": "80+0x20"
+        },
+        {
+          "series": "node_memory_MemTotal_bytes{job=\"node\",instance=\"node-exporter:9100\"}",
+          "values": "100+0x20"
+        },
+        {
+          "series": "node_filesystem_avail_bytes{job=\"node\",instance=\"node-exporter:9100\",mountpoint=\"/\",device=\"/dev/vda1\",fstype=\"ext4\"}",
+          "values": "70+0x20"
+        },
+        {
+          "series": "node_filesystem_size_bytes{job=\"node\",instance=\"node-exporter:9100\",mountpoint=\"/\",device=\"/dev/vda1\",fstype=\"ext4\"}",
+          "values": "100+0x20"
+        },
+        {
+          "series": "node_filesystem_readonly{job=\"node\",instance=\"node-exporter:9100\",mountpoint=\"/\",device=\"/dev/vda1\",fstype=\"ext4\"}",
+          "values": "0+0x20"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "0m",
+          "alertname": "NodeExporterDown",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "1m",
+          "alertname": "NodeExporterDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "job": "node",
+                "instance": "node-exporter:9100",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "Coletor indisponível em node-exporter:9100"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "CPU pending then firing",
+      "interval": "1m",
+      "input_series": [
+        {
+          "series": "up{job=\"node\",instance=\"node-exporter:9100\"}",
+          "values": "1+0x20"
+        },
+        {
+          "series": "node_cpu_seconds_total{job=\"node\",instance=\"node-exporter:9100\",cpu=\"0\",mode=\"idle\"}",
+          "values": "0+3x20"
+        },
+        {
+          "series": "node_memory_MemAvailable_bytes{job=\"node\",instance=\"node-exporter:9100\"}",
+          "values": "80+0x20"
+        },
+        {
+          "series": "node_memory_MemTotal_bytes{job=\"node\",instance=\"node-exporter:9100\"}",
+          "values": "100+0x20"
+        },
+        {
+          "series": "node_filesystem_avail_bytes{job=\"node\",instance=\"node-exporter:9100\",mountpoint=\"/\",device=\"/dev/vda1\",fstype=\"ext4\"}",
+          "values": "70+0x20"
+        },
+        {
+          "series": "node_filesystem_size_bytes{job=\"node\",instance=\"node-exporter:9100\",mountpoint=\"/\",device=\"/dev/vda1\",fstype=\"ext4\"}",
+          "values": "100+0x20"
+        },
+        {
+          "series": "node_filesystem_readonly{job=\"node\",instance=\"node-exporter:9100\",mountpoint=\"/\",device=\"/dev/vda1\",fstype=\"ext4\"}",
+          "values": "0+0x20"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "5m",
+          "alertname": "HostHighCPU",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "6m",
+          "alertname": "HostHighCPU",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "instance": "node-exporter:9100",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "CPU acima de 85% em node-exporter:9100"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "memory pending then firing",
+      "interval": "1m",
+      "input_series": [
+        {
+          "series": "up{job=\"node\",instance=\"node-exporter:9100\"}",
+          "values": "1+0x20"
+        },
+        {
+          "series": "node_cpu_seconds_total{job=\"node\",instance=\"node-exporter:9100\",cpu=\"0\",mode=\"idle\"}",
+          "values": "0+60x20"
+        },
+        {
+          "series": "node_memory_MemAvailable_bytes{job=\"node\",instance=\"node-exporter:9100\"}",
+          "values": "5+0x20"
+        },
+        {
+          "series": "node_memory_MemTotal_bytes{job=\"node\",instance=\"node-exporter:9100\"}",
+          "values": "100+0x20"
+        },
+        {
+          "series": "node_filesystem_avail_bytes{job=\"node\",instance=\"node-exporter:9100\",mountpoint=\"/\",device=\"/dev/vda1\",fstype=\"ext4\"}",
+          "values": "70+0x20"
+        },
+        {
+          "series": "node_filesystem_size_bytes{job=\"node\",instance=\"node-exporter:9100\",mountpoint=\"/\",device=\"/dev/vda1\",fstype=\"ext4\"}",
+          "values": "100+0x20"
+        },
+        {
+          "series": "node_filesystem_readonly{job=\"node\",instance=\"node-exporter:9100\",mountpoint=\"/\",device=\"/dev/vda1\",fstype=\"ext4\"}",
+          "values": "0+0x20"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "4m",
+          "alertname": "HostHighMemory",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "5m",
+          "alertname": "HostHighMemory",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "job": "node",
+                "instance": "node-exporter:9100",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "Memória acima de 90% em node-exporter:9100"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "disk pending then firing",
+      "interval": "1m",
+      "input_series": [
+        {
+          "series": "up{job=\"node\",instance=\"node-exporter:9100\"}",
+          "values": "1+0x20"
+        },
+        {
+          "series": "node_cpu_seconds_total{job=\"node\",instance=\"node-exporter:9100\",cpu=\"0\",mode=\"idle\"}",
+          "values": "0+60x20"
+        },
+        {
+          "series": "node_memory_MemAvailable_bytes{job=\"node\",instance=\"node-exporter:9100\"}",
+          "values": "80+0x20"
+        },
+        {
+          "series": "node_memory_MemTotal_bytes{job=\"node\",instance=\"node-exporter:9100\"}",
+          "values": "100+0x20"
+        },
+        {
+          "series": "node_filesystem_avail_bytes{job=\"node\",instance=\"node-exporter:9100\",mountpoint=\"/\",device=\"/dev/vda1\",fstype=\"ext4\"}",
+          "values": "5+0x20"
+        },
+        {
+          "series": "node_filesystem_size_bytes{job=\"node\",instance=\"node-exporter:9100\",mountpoint=\"/\",device=\"/dev/vda1\",fstype=\"ext4\"}",
+          "values": "100+0x20"
+        },
+        {
+          "series": "node_filesystem_readonly{job=\"node\",instance=\"node-exporter:9100\",mountpoint=\"/\",device=\"/dev/vda1\",fstype=\"ext4\"}",
+          "values": "0+0x20"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "9m",
+          "alertname": "HostDiskAlmostFull",
+          "exp_alerts": []
+        },
+        {
+          "eval_time": "10m",
+          "alertname": "HostDiskAlmostFull",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "job": "node",
+                "instance": "node-exporter:9100",
+                "mountpoint": "/",
+                "device": "/dev/vda1",
+                "fstype": "ext4",
+                "severity": "warning"
+              },
+              "exp_annotations": {
+                "summary": "Disco acima de 85% em node-exporter:9100:/"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "readonly disk should not fire",
+      "interval": "1m",
+      "input_series": [
+        {
+          "series": "up{job=\"node\",instance=\"node-exporter:9100\"}",
+          "values": "1+0x20"
+        },
+        {
+          "series": "node_cpu_seconds_total{job=\"node\",instance=\"node-exporter:9100\",cpu=\"0\",mode=\"idle\"}",
+          "values": "0+60x20"
+        },
+        {
+          "series": "node_memory_MemAvailable_bytes{job=\"node\",instance=\"node-exporter:9100\"}",
+          "values": "80+0x20"
+        },
+        {
+          "series": "node_memory_MemTotal_bytes{job=\"node\",instance=\"node-exporter:9100\"}",
+          "values": "100+0x20"
+        },
+        {
+          "series": "node_filesystem_avail_bytes{job=\"node\",instance=\"node-exporter:9100\",mountpoint=\"/\",device=\"/dev/vda1\",fstype=\"ext4\"}",
+          "values": "5+0x20"
+        },
+        {
+          "series": "node_filesystem_size_bytes{job=\"node\",instance=\"node-exporter:9100\",mountpoint=\"/\",device=\"/dev/vda1\",fstype=\"ext4\"}",
+          "values": "100+0x20"
+        },
+        {
+          "series": "node_filesystem_readonly{job=\"node\",instance=\"node-exporter:9100\",mountpoint=\"/\",device=\"/dev/vda1\",fstype=\"ext4\"}",
+          "values": "1+0x20"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "15m",
+          "alertname": "HostDiskAlmostFull",
+          "exp_alerts": []
+        }
+      ]
+    },
+    {
+      "name": "exporter recovers",
+      "interval": "1m",
+      "input_series": [
+        {
+          "series": "up{job=\"node\",instance=\"node-exporter:9100\"}",
+          "values": "0+0x2 1+0x17"
+        },
+        {
+          "series": "node_cpu_seconds_total{job=\"node\",instance=\"node-exporter:9100\",cpu=\"0\",mode=\"idle\"}",
+          "values": "0+60x20"
+        },
+        {
+          "series": "node_memory_MemAvailable_bytes{job=\"node\",instance=\"node-exporter:9100\"}",
+          "values": "80+0x20"
+        },
+        {
+          "series": "node_memory_MemTotal_bytes{job=\"node\",instance=\"node-exporter:9100\"}",
+          "values": "100+0x20"
+        },
+        {
+          "series": "node_filesystem_avail_bytes{job=\"node\",instance=\"node-exporter:9100\",mountpoint=\"/\",device=\"/dev/vda1\",fstype=\"ext4\"}",
+          "values": "70+0x20"
+        },
+        {
+          "series": "node_filesystem_size_bytes{job=\"node\",instance=\"node-exporter:9100\",mountpoint=\"/\",device=\"/dev/vda1\",fstype=\"ext4\"}",
+          "values": "100+0x20"
+        },
+        {
+          "series": "node_filesystem_readonly{job=\"node\",instance=\"node-exporter:9100\",mountpoint=\"/\",device=\"/dev/vda1\",fstype=\"ext4\"}",
+          "values": "0+0x20"
+        }
+      ],
+      "alert_rule_test": [
+        {
+          "eval_time": "1m",
+          "alertname": "NodeExporterDown",
+          "exp_alerts": [
+            {
+              "exp_labels": {
+                "job": "node",
+                "instance": "node-exporter:9100",
+                "severity": "critical"
+              },
+              "exp_annotations": {
+                "summary": "Coletor indisponível em node-exporter:9100"
+              }
+            }
+          ]
+        },
+        {
+          "eval_time": "4m",
+          "alertname": "NodeExporterDown",
+          "exp_alerts": []
+        }
+      ]
+    }
+  ]
+}
